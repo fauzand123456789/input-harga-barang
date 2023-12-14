@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Barang dari API</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input, button {
+            padding: 8px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Data Barang</h2>
+
+<form id="input-form">
+    <label for="nama-barang">Nama Barang:</label>
+    <input type="text" id="nama-barang" name="nama-barang" required>
+
+    <label for="harga-barang">Harga Barang:</label>
+    <input type="text" id="harga-barang" name="harga-barang" required>
+
+    <button type="button" onclick="addData()">Tambah Data</button>
+</form>
+
+<table id="data-table">
+    <thead>
+        <tr>
+            <th>Nama Barang</th>
+            <th>Harga Barang</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Data akan ditampilkan di sini -->
+    </tbody>
+</table>
+
+<script>
+    function addData() {
+        const namaBarang = document.getElementById('nama-barang').value;
+        const hargaBarang = document.getElementById('harga-barang').value;
+
+        // Validasi input
+        if (!namaBarang || !hargaBarang) {
+            alert('Mohon isi semua field!');
+            return;
+        }
+
+        // Menambahkan data ke dalam tabel
+        const dataTable = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+        const row = dataTable.insertRow();
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
+
+        cell1.textContent = namaBarang;
+        cell2.textContent = hargaBarang;
+
+        // Mengirim data ke API
+        fetch('https://sheet.best/api/sheets/bd8c5fd1-54e1-4975-8f5f-7704229c2e99', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                'Nama Barang': namaBarang,
+                'Harga Barang': hargaBarang,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => console.log('Data berhasil ditambahkan:', data))
+        .catch(error => console.error('Error adding data:', error));
+
+        // Mengosongkan form setelah data ditambahkan
+        document.getElementById('nama-barang').value = '';
+        document.getElementById('harga-barang').value = '';
+    }
+
+    // Mengambil data dari API menggunakan fetch
+    fetch('https://sheet.best/api/sheets/bd8c5fd1-54e1-4975-8f5f-7704229c2e99')
+        .then(response => response.json())
+        .then(data => {
+            // Memasukkan data ke dalam tabel
+            const dataTable = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+
+            data.forEach(item => {
+                const row = dataTable.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+
+                cell1.textContent = item['Nama Barang'];
+                cell2.textContent = item['Harga Barang'];
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+</script>
+
+</body>
+</html>
